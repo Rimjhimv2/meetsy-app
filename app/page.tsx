@@ -1,17 +1,65 @@
-import Header from "@/components/layout/header";
-import { PricingTable } from "@clerk/nextjs";
+// import Header from "@/components/layout/header";
+// import { PricingTable } from "@clerk/nextjs";
+
+// export default function Home() {
+//   return (
+//     <div>
+//       {/* Render Header at the top */}
+//       <Header />
+
+//       <h1 className="text-3xl font-bold my-6">Hello Nextjs</h1>
+
+//       <PricingTable />
+//     </div>
+//   );
+// }
+
+import { BackgroundGradient } from "@/components/landing/background-gradient";
+import CtaSection from "@/components/landing/cta-section";
+import FeaturesSection from "@/components/landing/feature-section";
+import HeroSection from "@/components/landing/hero-section";
+import HowItWorksSection from "@/components/landing/how-it-work-section";
+import PricingSection from "@/components/landing/pricing-section";
+import { MotionDiv } from "@/components/ui/motion-div";
 
 export default function Home() {
   return (
-    <div>
-      {/* Render Header at the top */}
-      <Header />
+    <div className="relative min-h-screen">
+      <BackgroundGradient />
+      <div className="relative z-10">
+        <MotionDiv
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+        >
+          <HeroSection />
+        </MotionDiv>
+        <MotionDiv
+          initial={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <FeaturesSection />
+        </MotionDiv>
+        <MotionDiv
+          initial={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <HowItWorksSection />
+        </MotionDiv>
 
-      <h1 className="text-3xl font-bold my-6">Hello Nextjs</h1>
+        <MotionDiv
+          initial={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <PricingSection />
+        </MotionDiv>
 
-      <PricingTable />
+        <MotionDiv
+          initial={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <CtaSection />
+        </MotionDiv>
+      </div>
     </div>
   );
 }
-
-
