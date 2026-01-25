@@ -52,7 +52,7 @@ const proUsers = [
   {
     clerkId: "pro_001_temp",
     email: "rimjhim@gmail.com",
-    name: "Rimjhim Verma",
+    name: "Rimjhim verma",
     subscriptionTier: "pro",
   },
   {
@@ -309,7 +309,7 @@ const freeUserAssignments = {
 
 // PRO USER ASSIGNMENTS (multiple communities and goals)
 const proUserCommunityAssignments = {
-  "Rohit Sharma": [
+  "Rimjhim verma": [
     "Modern Full Stack Next.js Course",
     "Meetsy Learners Hub",
     "Developer to Leader",
@@ -372,7 +372,7 @@ const proUserCommunityAssignments = {
 };
 
 const proUserGoalAssignments = {
-  "Rohit Sharma": {
+  "Rimjhim verma": {
     "Modern Full Stack Next.js Course": [
       "Next.js App Router & Server Components",
       "Database integration with Drizzle ORM",
@@ -388,7 +388,7 @@ const proUserGoalAssignments = {
       "Team communication",
     ],
   },
-  "Neha Verma": {
+  "Anaya": {
     "Modern Full Stack Next.js Course": [
       "TypeScript best practices",
       "Deployment & CI/CD",
@@ -434,7 +434,7 @@ const proUserGoalAssignments = {
       "Team communication",
       "Building engineering culture",
     ],
-    "Meetsy Learner Hub": [
+    "Meetsy Learners Hub": [
       "Modern web development fundamentals",
       "Career growth & job hunting",
     ],
@@ -466,9 +466,10 @@ const proUserGoalAssignments = {
       "Database integration with Drizzle ORM",
       "Authentication with Clerk",
     ],
-    "Meetsy Learner Hub": [
+    "Meetsy Learners Hub": [
       "Building real-world projects",
-      "Content creation tips",
+      "Personal branding & content creation",
+
     ],
     "Developer to Leader": ["Code review best practices", "Team communication"],
   },
@@ -485,7 +486,7 @@ const proUserGoalAssignments = {
   },
   "Maya Anderson (Pro)": {
     "AI & Machine Learning": ["Computer Vision basics", "TensorFlow and Keras"],
-    "Meetsy Learner Hub": [
+    "Meetsy Learners Hub": [
       "Modern web development fundamentals",
       "Building real-world projects",
     ],
@@ -500,7 +501,7 @@ const proUserGoalAssignments = {
       "Authentication with Clerk",
       "TypeScript best practices",
     ],
-    "Meetsy Learner Hub": [
+    "Meetsy Learners Hub": [
       "Building real-world projects",
       "Career growth & job hunting",
     ],
@@ -686,7 +687,7 @@ async function comprehensiveSeed() {
       [
         "Sofia Rodriguez (Pro)",
         "Aisha Patel (Pro)",
-        "Meeetsy Learners Hub",
+        "Meetsy Learners Hub",
       ],
       ["David Kim (Pro)", "Maya Anderson (Pro)", "AI & Machine Learning"],
       ["James Wilson (Pro)", "Lucas Martinez (Pro)", "Cloud & DevOps"],
@@ -694,7 +695,7 @@ async function comprehensiveSeed() {
       ["Marcus Johnson (Pro)", "James Wilson (Pro)", "Cloud & DevOps"],
       ["Nina Silva (Pro)", "Sofia Rodriguez (Pro)", "Developer to Leader"],
       ["Alex Taylor (Pro)", "Lucas Martinez (Pro)", "Cloud & DevOps"],
-      ["Rohit sharma", "Anaya", "Meetsy Learners hub"],
+      ["Rimjhim verma", "Anaya", "Meetsy Learners Hub"],
 
       // FREE to PRO matches (showing FREE users can match within limits)
       ["Free User One", "Emma Chen (Pro)", "Modern Full Stack Next.js Course"],
@@ -876,7 +877,7 @@ async function comprehensiveSeed() {
     console.log("🏘️  COMMUNITIES:");
     console.log("   • Modern Full Stack Next.js Course");
     console.log("   • Developer to Leader");
-    console.log("   • Meeetsy Learners Hub");
+    console.log("   • Meetsy Learners Hub");
     console.log("   • Python for Data Science");
     console.log("   • AI & Machine Learning");
     console.log("   • Cloud & DevOps\n");

@@ -50,7 +50,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "@/components/layout/header-wrapper";
 import Footer from "@/components/layout/footer";
-
+import { QueryProvider } from "@/components/layout/providers/query-provider";
 const outfitFont = Outfit({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -73,10 +73,11 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${outfitFont.className} antialiased`}>
-          
+            <QueryProvider>
            <HeaderWrapper/>
             {children}
            <Footer/>
+           </QueryProvider>
            
           
          
