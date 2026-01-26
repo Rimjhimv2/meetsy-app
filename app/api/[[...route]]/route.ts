@@ -43,19 +43,42 @@ app.onError((err, c) => {
 });
 
 // middleware
+// app.use("/*", async (c, next) => {
+//   const publicRoutes = ["/api/communities/all"];
+// if (publicRoutes.some((route) => c.req.path.startsWith(route))) {
+//   return await next();
+// }
+
+
+//   const session = await auth();
+//   if (!session.userId) {
+//     throw new HTTPException(401, { message: "Unauthorized" });
+//   }
+//   c.set("userId", session.userId);
+//   return await next();
+// });
+
 app.use("/*", async (c, next) => {
   const publicRoutes = ["/api/communities/all"];
-  if (publicRoutes.includes(c.req.path)) {
+
+  // Agar route public hai, session check skip karo
+  if (publicRoutes.some((route) => c.req.path.startsWith(route))) {
     return await next();
   }
 
+  // Auth routes ke liye session check
   const session = await auth();
-  if (!session.userId) {
+  if (!session?.userId) {
     throw new HTTPException(401, { message: "Unauthorized" });
   }
-  c.set("userId", session.userId);
+
+  // User lookup sirf auth routes ke liye
+  const user = await getOrCreateUserByClerkId(session.userId);
+  c.set("userId", user.id);
+
   return await next();
 });
+
 
 const routes = app
   .route("/communities", communitiesApp)
