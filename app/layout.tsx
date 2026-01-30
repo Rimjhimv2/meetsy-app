@@ -50,14 +50,14 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "@/components/layout/header-wrapper";
 import Footer from "@/components/layout/footer";
-import { QueryProvider } from "@/components/layout/providers/query-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
+
 const outfitFont = Outfit({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-
-  
 export const metadata: Metadata = {
   title: "Meetsy",
   description:
@@ -73,14 +73,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${outfitFont.className} antialiased`}>
-            <QueryProvider>
-           <HeaderWrapper/>
+          <QueryProvider>
+            <HeaderWrapper />
             {children}
-           <Footer/>
-           </QueryProvider>
-           
-          
-         
+            <Footer />
+          </QueryProvider>
+          <Toaster position="top-right" />
         </body>
       </html>
     </ClerkProvider>

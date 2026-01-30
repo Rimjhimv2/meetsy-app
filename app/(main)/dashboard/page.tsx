@@ -152,7 +152,8 @@ export default function DashboardPage() {
                           </CardTitle>
                           <CardDescription className="text-xs text-muted-foreground mt-1">
                             <span>
-                              {match.userGoals.map((g) => g.title).join(", ")}
+                              {match.userGoals?.map((g) => g.title).join(", ") || "No goals"}
+
                             </span>
                           </CardDescription>
                         </div>

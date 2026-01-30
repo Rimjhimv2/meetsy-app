@@ -172,3 +172,16 @@ export const conversationSummariesRelations = relations(
     }),
   })
 );
+export const communityMembersRelations = relations(
+  communityMembers,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [communityMembers.userId],
+      references: [users.id],
+    }),
+    community: one(communities, {
+      fields: [communityMembers.communityId],
+      references: [communities.id],
+    }),
+  })
+);

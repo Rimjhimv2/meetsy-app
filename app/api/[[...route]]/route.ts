@@ -4,9 +4,12 @@ import { handle } from "hono/vercel";
 import { HTTPException } from "hono/http-exception";
 import { communitiesApp } from "@/app/server/community-routes";
 import { learningGoalsApp } from "@/app/server/learning-goals-routes";
-import { matchesApp } from "@/app/server/matches-routes";
+import  {matchesApp}  from "@/app/server/matches-routes";
 import { conversationsApp } from "@/app/server/conversations-routes";
 import { userApp } from "@/app/server/users-routes";
+
+
+import { getOrCreateUserByClerkId } from "@/lib/user-utils";
 
 type Variables = {
   userId: string;
@@ -58,24 +61,16 @@ app.onError((err, c) => {
 //   return await next();
 // });
 
+
 app.use("/*", async (c, next) => {
   const publicRoutes = ["/api/communities/all"];
 
-  // Agar route public hai, session check skip karo
   if (publicRoutes.some((route) => c.req.path.startsWith(route))) {
     return await next();
   }
 
-  // Auth routes ke liye session check
-  const session = await auth();
-  if (!session?.userId) {
-    throw new HTTPException(401, { message: "Unauthorized" });
-  }
-
-  // User lookup sirf auth routes ke liye
-  const user = await getOrCreateUserByClerkId(session.userId);
-  c.set("userId", user.id);
-
+  // 🔥 DEV BYPASS — Clerk disabled temporarily
+  c.set("userId", "seed-user-id");
   return await next();
 });
 

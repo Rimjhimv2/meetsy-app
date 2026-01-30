@@ -1,3 +1,229 @@
+// import { Hono } from "hono";
+// import { authMiddleware } from "./middleware/auth-middleware";
+// import { aiMatchUsers } from "@/lib/ai";
+// import {
+//   findMatchesByUserId,
+//   getGoalsByUserAndCommunity,
+//   getGoalsByUsersAndCommunity,
+//   getPartnerUserId,
+//   getUserMatches,
+//   getUsersByIds,
+// } from "@/lib/db-helpers";
+// import { db } from "@/db";
+// import {
+//   communities,
+//   conversations,
+//   learningGoals,
+//   matches,
+//   users,
+// } from "@/db/schema";
+// import { eq, inArray } from "drizzle-orm";
+// import { HTTPException } from "hono/http-exception";
+
+// type Variables = {
+//   userId: string;
+// };
+// const matchesApp = new Hono<{ Variables: Variables }>()
+//   .use("/*", authMiddleware)
+
+//   // ✅ 1️⃣ STATIC ROUTE FIRST (VERY IMPORTANT)
+//   .get("/allmatches", async (c) => {
+//     const user = c.get("user");
+
+//     const myMatches = await getUserMatches(user.id);
+
+//     const partnerIds = myMatches.map((match) =>
+//       getPartnerUserId(match, user.id)
+//     );
+
+//     const communitiesSet = new Set(myMatches.map((m) => m.communityId));
+//     const communityIdsArray = Array.from(communitiesSet);
+
+//     const [partnersMap, communitiesMap, ...allGoalsMaps] = await Promise.all([
+//       getUsersByIds(partnerIds),
+//       (async () => {
+//         if (communityIdsArray.length === 0) return new Map();
+//         const communitiesList = await db
+//           .select()
+//           .from(communities)
+//           .where(inArray(communities.id, communityIdsArray));
+//         return new Map(communitiesList.map((c) => [c.id, c]));
+//       })(),
+//       ...communityIdsArray.map((communityId) =>
+//         getGoalsByUsersAndCommunity(partnerIds, communityId)
+//       ),
+//       ...communityIdsArray.map((communityId) =>
+//         getGoalsByUserAndCommunity(user.id, communityId)
+//       ),
+//     ]);
+
+//     const mergedPartnerGoalsMap = new Map<
+//       string,
+//       (typeof learningGoals.$inferSelect)[]
+//     >();
+
+//     const partnerGoalsMaps = allGoalsMaps.slice(
+//       0,
+//       communityIdsArray.length
+//     ) as Map<string, (typeof learningGoals.$inferSelect)[]>[];
+
+//     for (const goalsMap of partnerGoalsMaps) {
+//       for (const [userId, goals] of goalsMap.entries()) {
+//         if (!mergedPartnerGoalsMap.has(userId)) {
+//           mergedPartnerGoalsMap.set(userId, []);
+//         }
+//         mergedPartnerGoalsMap.get(userId)!.push(...goals);
+//       }
+//     }
+
+//     const userGoalsMaps = allGoalsMaps.slice(
+//       communityIdsArray.length
+//     ) as (typeof learningGoals.$inferSelect)[][];
+
+//     const userGoalsByCommunity = new Map<
+//       string,
+//       (typeof learningGoals.$inferSelect)[]
+//     >();
+
+//     for (let i = 0; i < communityIdsArray.length; i++) {
+//       userGoalsByCommunity.set(communityIdsArray[i], userGoalsMaps[i] || []);
+//     }
+
+//     const enrichedMatches = myMatches.map((match) => {
+//       const partnerId = getPartnerUserId(match, user.id);
+//       const partner = partnersMap.get(partnerId);
+//       const community = communitiesMap.get(match.communityId);
+
+//       return {
+//         ...match,
+//         partner: {
+//           id: partner?.id || partnerId,
+//           name: partner?.name || "Unknown User",
+//           imageUrl: partner?.imageUrl || null,
+//         },
+//         community: community
+//           ? {
+//               id: community.id,
+//               name: community.name,
+//               description: community.description,
+//               imageUrl: community.imageUrl,
+//             }
+//           : null,
+//       };
+//     });
+
+//     return c.json(enrichedMatches);
+//   })
+
+//   // ✅ 2️⃣ COMMUNITY ROUTES
+//   .post("/:communityId/aimatch", async (c) => {
+//     const user = c.get("user");
+//     const communityId = c.req.param("communityId");
+//     return c.json(await aiMatchUsers(user, communityId));
+//   })
+
+//   .get("/:communityId/matches", async (c) => {
+//     const user = c.get("user");
+//     const communityId = c.req.param("communityId");
+
+//     const potentialMatches = await findMatchesByUserId(user.id, communityId);
+
+//     const enrichedMatches = await Promise.all(
+//       potentialMatches.map(async (match) => {
+//         const [matchUser] = await db
+//           .select()
+//           .from(users)
+//           .where(eq(users.id, match.userId));
+
+//         return {
+//           ...match,
+//           name: matchUser?.name || "Unknown",
+//           imageUrl: matchUser?.imageUrl,
+//         };
+//       })
+//     );
+
+//     return c.json(enrichedMatches);
+//   })
+
+//   // ✅ 3️⃣ MATCH ROUTES
+//   .put("/:matchId/accept", async (c) => {
+//     const matchId = c.req.param("matchId");
+
+//     const [match] = await db
+//       .update(matches)
+//       .set({ status: "accepted" })
+//       .where(eq(matches.id, matchId))
+//       .returning();
+
+//     if (!match) {
+//       throw new HTTPException(404, { message: "Match not found" });
+//     }
+
+//     let [conversation] = await db
+//       .select()
+//       .from(conversations)
+//       .where(eq(conversations.matchId, match.id));
+
+//     if (!conversation) {
+//       [conversation] = await db
+//         .insert(conversations)
+//         .values({ matchId: match.id })
+//         .returning();
+//     }
+
+//     // 🔥 FRONTEND UNBLOCK
+//     return c.json({
+//       matchId: match.id,
+//       conversationId: conversation.id,
+//     });
+//   })
+
+//   .get("/:matchId/conversation", async (c) => {
+//     const matchId = c.req.param("matchId");
+//     const user = c.get("user");
+
+//     const [match] = await db
+//       .select()
+//       .from(matches)
+//       .where(eq(matches.id, matchId));
+
+//     if (!match) throw new HTTPException(404, { message: "Match not found" });
+
+//     const otherUserId =
+//       match.user1Id === user.id ? match.user2Id : match.user1Id;
+
+//     const [otherUser] = await db
+//       .select()
+//       .from(users)
+//       .where(eq(users.id, otherUserId));
+
+//     let [conversation] = await db
+//       .select()
+//       .from(conversations)
+//       .where(eq(conversations.matchId, matchId));
+
+//     if (!conversation) {
+//       [conversation] = await db
+//         .insert(conversations)
+//         .values({ matchId })
+//         .returning();
+//     }
+
+//     return c.json({
+//       ...conversation,
+//       status: match.status,
+//       currentUserId: user.id,
+//       otherUser: {
+//         id: otherUser.id,
+//         name: otherUser.name,
+//         imageUrl: otherUser.imageUrl,
+//       },
+//     });
+//   });
+// export default matchesApp;
+
+
 import { Hono } from "hono";
 import { authMiddleware } from "./middleware/auth-middleware";
 import { aiMatchUsers } from "@/lib/ai";
