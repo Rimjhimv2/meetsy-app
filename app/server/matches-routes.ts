@@ -393,26 +393,56 @@ const matchesApp = new Hono<{ Variables: Variables }>()
     // return c.json(enrichedMatches);
     // ✅ Only accepted matches (Active Chats ke liye)
 // ✅ Include both pending and accepted matches for UI display
-const activeMatches = enrichedMatches.filter(
-  (match) => match.status === "accepted" || match.status === "pending"
+// const activeMatches = enrichedMatches.filter(
+//   (match) => match.status === "accepted" || match.status === "pending"
+// );
+
+// // ✅ Remove duplicate partners (same user repeat na ho)
+// // ✅ Remove duplicate partners (same user repeat na ho)
+// const uniqueMatchesMap = new Map<string, any>();
+
+// for (const match of activeMatches) {
+//   const partnerId = getPartnerUserId(match, user.id);
+
+//   if (!uniqueMatchesMap.has(partnerId)) {
+//     uniqueMatchesMap.set(partnerId, match);
+//   }
+// }
+
+// // Final unique active chats list
+// const uniqueActiveChats = Array.from(uniqueMatchesMap.values());
+
+// return c.json(uniqueActiveChats);
+
+
+
+
+
+
+//imp 
+const pendingMatches = enrichedMatches.filter(
+  (match) => match.status === "pending"
 );
 
-// ✅ Remove duplicate partners (same user repeat na ho)
-// ✅ Remove duplicate partners (same user repeat na ho)
-const uniqueMatchesMap = new Map<string, any>();
+const acceptedMatches = enrichedMatches.filter(
+  (match) => match.status === "accepted"
+);
 
-for (const match of activeMatches) {
+// Remove duplicate partners in accepted only
+const uniqueAcceptedMap = new Map<string, any>();
+
+for (const match of acceptedMatches) {
   const partnerId = getPartnerUserId(match, user.id);
-
-  if (!uniqueMatchesMap.has(partnerId)) {
-    uniqueMatchesMap.set(partnerId, match);
+  if (!uniqueAcceptedMap.has(partnerId)) {
+    uniqueAcceptedMap.set(partnerId, match);
   }
 }
 
-// Final unique active chats list
-const uniqueActiveChats = Array.from(uniqueMatchesMap.values());
+return c.json({
+  pending: pendingMatches,
+  active: Array.from(uniqueAcceptedMap.values()),
+});
 
-return c.json(uniqueActiveChats);
 
 
 // Return all active matches including pending
