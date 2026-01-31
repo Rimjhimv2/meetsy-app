@@ -45,22 +45,7 @@ app.onError((err, c) => {
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
-// middleware
-// app.use("/*", async (c, next) => {
-//   const publicRoutes = ["/api/communities/all"];
-// if (publicRoutes.some((route) => c.req.path.startsWith(route))) {
-//   return await next();
-// }
 
-
-//   const session = await auth();
-//   if (!session.userId) {
-//     throw new HTTPException(401, { message: "Unauthorized" });
-//   }
-//   c.set("userId", session.userId);
-//   return await next();
-// });
-// middleware
 app.use("/*", async (c, next) => {
   const publicRoutes = ["/api/communities/all"];
   if (publicRoutes.includes(c.req.path)) {
@@ -75,19 +60,6 @@ app.use("/*", async (c, next) => {
   return await next();
 });
 
-
-// app.use("/*", async (c, next) => {
-//   const publicRoutes = ["/api/communities/all"];
-
-//   if (publicRoutes.some((route) => c.req.path.startsWith(route))) {
-//     return await next();
-//   }
-
-//   // 🔥 DEV BYPASS — Clerk disabled temporarily
-//   // c.set("userId", "seed-user-id");
-//   c.set("userId", '63f0da8e-514a-4c56-8571-c9ac33c4cfa6');
-//   return await next();
-// });
 
 
 const routes = app
