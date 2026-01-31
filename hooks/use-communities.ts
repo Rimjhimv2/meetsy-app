@@ -43,26 +43,6 @@ export const useCommunityGoals = (communityId: string | null) => {
   });
 };
 
-// export const useJoinCommunity = () => {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: async (communityId: string) => {
-//       const res = await client.api.communities[":communityId"].join.$post({
-//         param: { communityId: communityId },
-//       });
-//       if (!res.ok) {
-//         throw new Error("Failed to join community");
-//       }
-//       return res.json();
-//     },
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ["communities"] });
-//     },
-//     onError: (error) => {
-//       console.error("Error joining community", error);
-//     },
-//   });
-// };
 
 export const useJoinCommunity = () => {
   const queryClient = useQueryClient();
