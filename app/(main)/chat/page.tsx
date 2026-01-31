@@ -78,7 +78,8 @@ export default function ChatPage() {
                         Their Learning Goals:
                       </p>
                       <div className="space-y-2">
-                        {match.partnerGoals.map((g) => (
+{match.partnerGoals.map((g: any) => (
+
                           <Badge
                             key={g.id}
                             variant="secondary"
