@@ -370,53 +370,82 @@ export default function ChatInterface({ matchId }: { matchId: string }) {
   const { user: clerkUser } = useUser();
   const [message, setMessage] = useState("");
 
-  //fetch the conversation for the match
-  const { data: conversation } = useQuery({
-    queryKey: ["conversation", matchId],
-    queryFn: async () => {
-      const res = await client.api.matches[":matchId"].conversation.$get({
+ 
+  //fetch the messages for the conversation
+ // ✅ Fetch conversation for this match
+ // ✅ Fetch conversation for this match
+const { data: conversation } = useQuery({
+  queryKey: ["conversation", matchId],
+
+  queryFn: async () => {
+    const res =
+      await client.api.matches[":matchId"].conversation.$get({
         param: { matchId },
       });
-      if (!res.ok) {
-        throw new Error("Failed to fetch conversation");
-      }
-      return res.json();
-    },
-  });
 
-  //fetch the messages for the conversation
-  const { data: messages } = useQuery({
-    queryKey: ["messages", conversation?.id],
-    queryFn: async () => {
-      const res = await client.api.conversations[
-        ":conversationId"
-      ].messages.$get({
-        param: { conversationId: conversation?.id ?? "" },
-      });
-      if (!res.ok) {
-        throw new Error("Failed to fetch messages");
-      }
-      return res.json();
-    },
-    refetchInterval: 5000, // poll every 5 seconds
-  });
+    if (!res.ok) {
+      throw new Error("Failed to fetch conversation");
+    }
+
+    return res.json();
+  },
+
+  enabled: !!matchId,
+});
+
+// ✅ Fetch messages for this conversation
+// ✅ Fetch messages for this conversation
+const { data: messages } = useQuery({
+  queryKey: ["messages", conversation?.id],
+
+  enabled: !!conversation?.id,
+
+  queryFn: async () => {
+    const res = await client.api.conversations[
+      ":conversationId"
+    ].messages.$get({
+      param: { conversationId: conversation!.id },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch messages");
+
+    return res.json();
+  },
+
+  refetchInterval: 5000,
+});
+
+
 
   const queryClient = useQueryClient();
 
+  // const sendMessageMutation = useMutation({
+  //   mutationFn: async () => {
+  //     const res = await client.api.conversations[
+  //       ":conversationId"
+  //     ].messages.$post({
+  //       param: { conversationId: conversation?.id ?? "" },
+  //       // @ts-expect-error - content is not defined in the API client
+  //       json: { content: message },
+  //     });
+  //     if (!res.ok) {
+  //       throw new Error("Failed to send message");
+  //     }
+  //     return res.json();
+  //   },
   const sendMessageMutation = useMutation({
-    mutationFn: async () => {
-      const res = await client.api.conversations[
-        ":conversationId"
-      ].messages.$post({
-        param: { conversationId: conversation?.id ?? "" },
-        // @ts-expect-error - content is not defined in the API client
-        json: { content: message },
-      });
-      if (!res.ok) {
-        throw new Error("Failed to send message");
-      }
-      return res.json();
-    },
+  mutationFn: async () => {
+    const res = await client.api.conversations[
+      ":conversationId"
+    ].messages.$post({
+      param: { conversationId: conversation!.id }, // ✅ FIXED
+      json: { content: message },
+    });
+
+    return res.json();
+  },
+
+
     onSuccess: () => {
       setMessage("");
       queryClient.invalidateQueries({
@@ -550,7 +579,8 @@ export default function ChatInterface({ matchId }: { matchId: string }) {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    console.log("send message");
+                    // console.log("send message");
+                  sendMessageMutation.mutate(); 
                   }
                 }}
               />

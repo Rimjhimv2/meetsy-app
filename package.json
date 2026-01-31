@@ -15,6 +15,7 @@
   "dependencies": {
     "@ai-sdk/google": "^3.0.18",
     "@clerk/nextjs": "^6.36.8",
+    "@google/generative-ai": "^0.24.1",
     "@hono/clerk-auth": "^3.1.0",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-slot": "^1.2.4",

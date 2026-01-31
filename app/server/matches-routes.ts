@@ -390,27 +390,80 @@ const matchesApp = new Hono<{ Variables: Variables }>()
       };
     });
 
-    return c.json(enrichedMatches);
+    // return c.json(enrichedMatches);
+    // ✅ Only accepted matches (Active Chats ke liye)
+// ✅ Include both pending and accepted matches for UI display
+const activeMatches = enrichedMatches.filter(
+  (match) => match.status === "accepted" || match.status === "pending"
+);
+
+// ✅ Remove duplicate partners (same user repeat na ho)
+// ✅ Remove duplicate partners (same user repeat na ho)
+const uniqueMatchesMap = new Map<string, any>();
+
+for (const match of activeMatches) {
+  const partnerId = getPartnerUserId(match, user.id);
+
+  if (!uniqueMatchesMap.has(partnerId)) {
+    uniqueMatchesMap.set(partnerId, match);
+  }
+}
+
+// Final unique active chats list
+const uniqueActiveChats = Array.from(uniqueMatchesMap.values());
+
+return c.json(uniqueActiveChats);
+
+
+// Return all active matches including pending
+
+
   })
-  .put("/:matchId/accept", async (c) => {
-    const matchId = c.req.param("matchId");
 
-    const [match] = await db
-      .update(matches)
-      .set({ status: "accepted" })
-      .where(eq(matches.id, matchId))
-      .returning();
+//   .put("/:matchId/accept", async (c) => {
+//     const matchId = c.req.param("matchId");
 
-    if (!match) {
-      throw new HTTPException(404, { message: "Match not found" });
-    }
+//     const [match] = await db
+//       .update(matches)
+//       .set({ status: "accepted" })
+//       .where(eq(matches.id, matchId))
+//       .returning();
 
-    await db.insert(conversations).values({
-      matchId: match.id,
-    });
+//     if (!match) {
+//       throw new HTTPException(404, { message: "Match not found" });
+//     }
 
-    return c.json(match);
-  })
+//     // await db.insert(conversations).values({
+//     //   matchId: match.id,
+//     // });
+//  await db.insert(conversations).values({
+//   matchId: match.id,
+//   user1Id: match.user1Id,
+//   user2Id: match.user2Id,
+// });
+
+
+
+//     return c.json(match);
+//   })
+
+.put("/:matchId/accept", async (c) => {
+  const matchId = c.req.param("matchId");
+
+  const [match] = await db
+    .update(matches)
+    .set({ status: "accepted" })
+    .where(eq(matches.id, matchId))
+    .returning();
+
+  if (!match) {
+    throw new HTTPException(404, { message: "Match not found" });
+  }
+
+  return c.json(match);
+})
+
+
   .get("/:matchId/conversation", async (c) => {
     const matchId = c.req.param("matchId");
     const user = c.get("user");
@@ -441,19 +494,40 @@ const matchesApp = new Hono<{ Variables: Variables }>()
 
     //check if conversation exists
 
-    let [conversation] = await db
-      .select()
-      .from(conversations)
-      .where(eq(conversations.matchId, matchId));
+    // let [conversation] = await db
+    //   .select()
+    //   .from(conversations)
+    //   .where(eq(conversations.matchId, matchId));
 
-    if (!conversation) {
-      [conversation] = await db
-        .insert(conversations)
-        .values({
-          matchId: matchId,
-        })
-        .returning();
-    }
+    // if (!conversation) {
+    //   [conversation] = await db
+    //     .insert(conversations)
+    //     .values({
+    //       matchId: matchId,
+    //     })
+    //     .returning();
+    // }
+// 1️⃣ Fetch existing conversation
+let [conversation] = await db
+  .select()
+  .from(conversations)
+  .where(eq(conversations.matchId, matchId));
+
+if (!conversation) {
+  console.log("MATCH:", match);
+
+  [conversation] = await db
+  .insert(conversations)
+  .values({
+    matchId: match.id,
+    user1Id: match.user1Id,
+    user2Id: match.user2Id,
+    lastMessageAt: new Date(),
+  })
+  .returning();
+
+}
+
 
     return c.json({
       ...conversation,
