@@ -70,7 +70,7 @@ app.use("/*", async (c, next) => {
   }
 
   // 🔥 DEV BYPASS — Clerk disabled temporarily
-  c.set("userId", "seed-user-id");
+  // c.set("userId", "seed-user-id");
   return await next();
 });
 

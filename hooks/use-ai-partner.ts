@@ -103,24 +103,29 @@ import { client } from "@/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
+
 // export const useAiPartners = () => {
 //   const queryClient = useQueryClient();
 //   return useMutation({
 //     mutationFn: async (communityId: string) => {
-//       const res = await client.api.matches[":communityId"].aimatch.$post({
-//         param: { communityId },
-//       });
-//       if (!res.ok) {
-//         throw new Error("Failed to find ai partner");
+//       try {
+//         // Direct call using api client
+//         const data = await client.api.matches[":communityId"].aimatch.$post({
+//           param: { communityId },
+//         });
+//         return data; // JSON already resolved
+//       } catch (err: any) {
+//         console.error("AI Match error:", err);
+//         // Backend ka message agar ho to throw karo
+//         throw new Error(err?.message || "Failed to find AI partner");
 //       }
-//       return res.json();
 //     },
 //     onSuccess: (_, variables) => {
 //       queryClient.invalidateQueries({
 //         queryKey: ["potentialPartners", variables],
 //       });
 //     },
-//     onError: (error) => {
+//     onError: (error: any) => {
 //       console.error("Error finding ai partner", error);
 //     },
 //   });
@@ -128,30 +133,31 @@ import { useRouter } from "next/navigation";
 
 export const useAiPartners = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (communityId: string) => {
       try {
-        // Direct call using api client
-        const data = await client.api.matches[":communityId"].aimatch.$post({
-          param: { communityId },
-        });
-        return data; // JSON already resolved
+        const data =
+          await client.api.matches[":communityId"].aimatch.$post({
+            param: { communityId },
+          });
+        return data;
       } catch (err: any) {
         console.error("AI Match error:", err);
-        // Backend ka message agar ho to throw karo
         throw new Error(err?.message || "Failed to find AI partner");
       }
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["potentialPartners", variables],
-      });
-    },
+
+    onSuccess: () => {
+  queryClient.invalidateQueries({ queryKey: ["matches"] });
+},
+
     onError: (error: any) => {
       console.error("Error finding ai partner", error);
     },
   });
 };
+
 
 export const useMatches = () => {
   return useQuery({

@@ -317,11 +317,22 @@ export async function getUserMatches(
     conditions.push(eq(matches.status, status));
   }
 
-  return db
+  // return db
+  //   .select()
+  //   .from(matches)
+  //   .where(and(...conditions))
+  //   .orderBy(desc(matches.createdAt));
+return db
     .select()
     .from(matches)
-    .where(and(...conditions))
+    .where(
+      and(
+        sql`(${matches.user1Id} = ${userId} OR ${matches.user2Id} = ${userId})`,
+        inArray(matches.status, ["pending", "accepted"])
+      )
+    )
     .orderBy(desc(matches.createdAt));
+
 }
 
 export const getPartnerUserId = (
