@@ -63,14 +63,34 @@ export const matches = pgTable("matches", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// export const conversations = pgTable("conversations", {
+//   id: uuid("id").defaultRandom().primaryKey(),
+//   matchId: uuid("match_id")
+//     .references(() => matches.id)
+//     .notNull(),
+//   lastMessageAt: timestamp("last_message_at"),
+//   createdAt: timestamp("created_at").defaultNow().notNull(),
+// });
 export const conversations = pgTable("conversations", {
   id: uuid("id").defaultRandom().primaryKey(),
+
   matchId: uuid("match_id")
     .references(() => matches.id)
     .notNull(),
-  lastMessageAt: timestamp("last_message_at"),
+
+  user1Id: uuid("user1_id")
+    .references(() => users.id)
+    .notNull(),
+
+  user2Id: uuid("user2_id")
+    .references(() => users.id)
+    .notNull(),
+
+  lastMessageAt: timestamp("last_message_at").notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
 
 export const messages = pgTable("messages", {
   id: uuid("id").defaultRandom().primaryKey(),
