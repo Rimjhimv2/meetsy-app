@@ -642,78 +642,25 @@ const matchesApp = new Hono<{ Variables: Variables }>()
       };
     });
 
-    // return c.json(enrichedMatches);
-    // ✅ Only accepted matches (Active Chats ke liye)
-// ✅ Include both pending and accepted matches for UI display
-// const activeMatches = enrichedMatches.filter(
-//   (match) => match.status === "accepted" || match.status === "pending"
-// );
-// const activeMatches = enrichedMatches
-//   .filter((match) => match.status === "accepted" || match.status === "pending")
-//   .sort((a, b) => {
-//     if (a.status === "pending" && b.status === "accepted") return -1;
-//     if (a.status === "accepted" && b.status === "pending") return 1;
-//     return 0;
-//   });
-
-
-// const uniqueMatchesMap = new Map<string, any>();
-
-// for (const match of activeMatches) {
-//   const partnerId = getPartnerUserId(match, user.id);
-
-//   if (!uniqueMatchesMap.has(partnerId)) {
-//     uniqueMatchesMap.set(partnerId, match);
-//   }
-// }
-
-const activeMatches = enrichedMatches
-  .filter(
-    (match) => match.status === "accepted" || match.status === "pending"
-  )
-  .sort((a, b) => {
-    // 🔥 pending ko pehle lao
-    if (a.status === "pending" && b.status === "accepted") return -1;
-    if (a.status === "accepted" && b.status === "pending") return 1;
-    return 0;
-  });
-
-
-const uniqueMatchesMap = new Map<string, any>();
-
-for (const match of activeMatches) {
-  const partnerId = getPartnerUserId(match, user.id);
-
-  // pehla hi store hoga → accepted jeet jaayega
-  if (!uniqueMatchesMap.has(partnerId)) {
-    uniqueMatchesMap.set(partnerId, match);
-  }
-}
-
-const uniqueActiveChats = Array.from(uniqueMatchesMap.values());
-
-return c.json(uniqueActiveChats);
-  return c.json(uniqueActiveChats);
-})   // ✅ YE MISSING THA
-
-
+   
 // const activeMatches = enrichedMatches
 //   .filter(
 //     (match) => match.status === "accepted" || match.status === "pending"
 //   )
 //   .sort((a, b) => {
-//     // ✅ pending ko upar lao
+//     // 🔥 pending ko pehle lao
 //     if (a.status === "pending" && b.status === "accepted") return -1;
 //     if (a.status === "accepted" && b.status === "pending") return 1;
 //     return 0;
 //   });
+
 
 // const uniqueMatchesMap = new Map<string, any>();
 
 // for (const match of activeMatches) {
 //   const partnerId = getPartnerUserId(match, user.id);
 
-//   // pehla hi store hoga → pending jeetega
+//   // pehla hi store hoga → accepted jeet jaayega
 //   if (!uniqueMatchesMap.has(partnerId)) {
 //     uniqueMatchesMap.set(partnerId, match);
 //   }
@@ -721,51 +668,38 @@ return c.json(uniqueActiveChats);
 
 // const uniqueActiveChats = Array.from(uniqueMatchesMap.values());
 
-// // return c.json(uniqueActiveChats);
+// return c.json(uniqueActiveChats);
+//   return c.json(uniqueActiveChats);
+// })   // ✅ YE MISSING THA
 
-// return c.json({
-//   pending: pendingMatches,
-//   active: Array.from(uniqueAcceptedMap.values()),
-// });
+// 1️⃣ Pending matches → NO dedupe
+const pendingMatches = enrichedMatches.filter(
+  (match) => match.status === "pending"
+);
 
+// 2️⃣ Accepted matches → dedupe by partner
+const acceptedMatches = enrichedMatches.filter(
+  (match) => match.status === "accepted"
+);
 
+const uniqueAcceptedMap = new Map<string, any>();
 
-//   })
+for (const match of acceptedMatches) {
+  const partnerId = getPartnerUserId(match, user.id);
 
-// // 1️⃣ Pending matches (NO dedupe)
-// const pendingMatches = enrichedMatches.filter(
-//   (match) => match.status === "pending"
-// );
+  if (!uniqueAcceptedMap.has(partnerId)) {
+    uniqueAcceptedMap.set(partnerId, match);
+  }
+}
 
-// // 2️⃣ Accepted matches (dedupe by partner)
-// const acceptedMatches = enrichedMatches.filter(
-//   (match) => match.status === "accepted"
-// );
+// 3️⃣ Final response
+return c.json([
+  ...pendingMatches,
+  ...Array.from(uniqueAcceptedMap.values()),
+]);
 
-// const uniqueAcceptedMap = new Map<string, any>();
+})
 
-// for (const match of acceptedMatches) {
-//   const partnerId = getPartnerUserId(match, user.id);
-
-//   if (!uniqueAcceptedMap.has(partnerId)) {
-//     uniqueAcceptedMap.set(partnerId, match);
-//   }
-// }
-
-// return c.json({
-//   pending: pendingMatches,
-//   active: Array.from(uniqueAcceptedMap.values()),
-// });
-
-
-
-
-
-
-
-
-
-//   })
 
 .put("/:matchId/accept", async (c) => {
   const matchId = c.req.param("matchId");

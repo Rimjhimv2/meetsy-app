@@ -628,20 +628,41 @@ export const aiMatchUsers = async (
     for (const member of members) {
       if (existingMatchUserIds.has(member.user.id)) continue;
 
+      // const memberGoals = goalsMap.get(member.user.id) || [];
+      // if (memberGoals.length > 0) {
+      //   potentialPartners.push({
+      //     userId: member.user.id,
+      //     username: member.user.name,
+      //     goals: memberGoals.map((g: typeof learningGoals.$inferSelect) => ({
+      //       title: g.title,
+      //       description: g.description || "",
+      //     })),
+      //   });
       const memberGoals = goalsMap.get(member.user.id) || [];
-      if (memberGoals.length > 0) {
-        potentialPartners.push({
-          userId: member.user.id,
-          username: member.user.name,
-          goals: memberGoals.map((g: typeof learningGoals.$inferSelect) => ({
-            title: g.title,
-            description: g.description || "",
-          })),
-        });
-      } else {
-        memberWithoutGoals.push(member.user.name);
-      }
+
+// 🔥 DEV MODE: allow even users without goals
+potentialPartners.push({
+  userId: member.user.id,
+  username: member.user.name,
+  goals:
+    memberGoals.length > 0
+      ? memberGoals.map((g) => ({
+          title: g.title,
+          description: g.description || "",
+        }))
+      : [
+          {
+            title: "No goals yet",
+            description: "User has not added learning goals",
+          },
+        ],
+});
     }
+
+    //    else {
+    //     memberWithoutGoals.push(member.user.name);
+    //   }
+    // }
 
     console.log("Current user goals:", currentUserGoals);
     console.log("Total members:", members.length);

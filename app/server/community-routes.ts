@@ -46,11 +46,13 @@ const communitiesApp = new Hono<{ Variables: Variables }>()
         )
       );
 
-    if (existing) {
-      throw new HTTPException(400, {
-        message: "User already joined community",
-      });
-    }
+  if (existing) {
+  return c.json(
+    { message: "User already joined community" },
+    200
+  );
+}
+
 
     await db.insert(communityMembers).values({
       userId: user.id,

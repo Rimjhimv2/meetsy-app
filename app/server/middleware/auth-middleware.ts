@@ -40,10 +40,15 @@ export const authMiddleware = async (
   let clerkId = c.get("userId");
 
   // 🔥 DEV BYPASS SAFETY
+  // if (!clerkId) {
+  //   clerkId = "seed-user-id";
+  //   c.set("userId", clerkId);
+  // }
+
   if (!clerkId) {
-    clerkId = "seed-user-id";
-    c.set("userId", clerkId);
-  }
+  clerkId = "63f0da8e-514a-4c56-8571-c9ac33c4cfa6"; // REAL USER UUID
+  c.set("userId", clerkId);
+}
 
   const user = await getOrCreateUserByClerkId(clerkId);
 

@@ -43,23 +43,58 @@ export const useCommunityGoals = (communityId: string | null) => {
   });
 };
 
+// export const useJoinCommunity = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: async (communityId: string) => {
+//       const res = await client.api.communities[":communityId"].join.$post({
+//         param: { communityId: communityId },
+//       });
+//       if (!res.ok) {
+//         throw new Error("Failed to join community");
+//       }
+//       return res.json();
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["communities"] });
+//     },
+//     onError: (error) => {
+//       console.error("Error joining community", error);
+//     },
+//   });
+// };
+
 export const useJoinCommunity = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (communityId: string) => {
       const res = await client.api.communities[":communityId"].join.$post({
-        param: { communityId: communityId },
+        param: { communityId },
       });
+
+      // 👇 400 but already joined → treat as success
       if (!res.ok) {
+        const data = await res.json();
+
+        if (data?.error === "User already joined community") {
+          return data; // ✅ swallow error
+        }
+
         throw new Error("Failed to join community");
       }
+
       return res.json();
     },
+
     onSuccess: () => {
+      // 👇 refresh joined communities
       queryClient.invalidateQueries({ queryKey: ["communities"] });
+      queryClient.invalidateQueries({ queryKey: ["allCommunities"] });
     },
+
     onError: (error) => {
-      console.error("Error joining community", error);
+      console.error("Join community error:", error);
     },
   });
 };

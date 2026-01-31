@@ -305,6 +305,36 @@ export async function getUsersByIds(
  * Get all matches for a user across all communities
  * Optionally filter by status
  */
+// export async function getUserMatches(
+//   userId: string,
+//   status?: "pending" | "accepted" | "rejected"
+// ) {
+//   const conditions = [
+//     sql`(${matches.user1Id} = ${userId} OR ${matches.user2Id} = ${userId})`,
+//   ];
+
+//   if (status) {
+//     conditions.push(eq(matches.status, status));
+//   }
+
+//   // return db
+//   //   .select()
+//   //   .from(matches)
+//   //   .where(and(...conditions))
+//   //   .orderBy(desc(matches.createdAt));
+// return db
+//     .select()
+//     .from(matches)
+//     .where(
+//       and(
+//         sql`(${matches.user1Id} = ${userId} OR ${matches.user2Id} = ${userId})`,
+//         inArray(matches.status, ["pending", "accepted"])
+//       )
+//     )
+//     .orderBy(desc(matches.createdAt));
+
+// }
+
 export async function getUserMatches(
   userId: string,
   status?: "pending" | "accepted" | "rejected"
@@ -317,23 +347,13 @@ export async function getUserMatches(
     conditions.push(eq(matches.status, status));
   }
 
-  // return db
-  //   .select()
-  //   .from(matches)
-  //   .where(and(...conditions))
-  //   .orderBy(desc(matches.createdAt));
-return db
+  return db
     .select()
     .from(matches)
-    .where(
-      and(
-        sql`(${matches.user1Id} = ${userId} OR ${matches.user2Id} = ${userId})`,
-        inArray(matches.status, ["pending", "accepted"])
-      )
-    )
+    .where(and(...conditions))
     .orderBy(desc(matches.createdAt));
-
 }
+
 
 export const getPartnerUserId = (
   match: typeof matches.$inferSelect,
