@@ -24,7 +24,7 @@ async function addConversations() {
       .where(eq(users.id, TARGET_USER_ID));
 
     if (!targetUser) {
-      console.error("❌ User not found with ID:", TARGET_USER_ID);
+      console.error("User not found with ID:", TARGET_USER_ID);
       return;
     }
 
@@ -37,7 +37,7 @@ async function addConversations() {
       .where(eq(communityMembers.userId, TARGET_USER_ID));
 
     if (userCommunities.length === 0) {
-      console.error("❌ User is not part of any communities");
+      console.error("User is not part of any communities");
       return;
     }
 
@@ -62,7 +62,7 @@ async function addConversations() {
 
     if (potentialMatchUsers.length < 2) {
       console.error(
-        "❌ Not enough other users in communities to create matches"
+        " Not enough other users in communities to create matches"
       );
       return;
     }
@@ -151,7 +151,7 @@ async function addConversations() {
       console.log(`      With: ${conv.withUser}\n`);
     });
   } catch (error) {
-    console.error("\n❌ Error adding conversations:", error);
+    console.error("\nError adding conversations:", error);
     throw error;
   }
 }

@@ -19,7 +19,7 @@ async function queryUsers() {
       console.log(`   Tier: ${user.subscriptionTier}\n`);
     });
   } catch (error) {
-    console.error("❌ Error querying users:", error);
+    console.error("Error querying users:", error);
     throw error;
   }
 }
