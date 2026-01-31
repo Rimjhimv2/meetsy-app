@@ -10,18 +10,39 @@ type AuthVariables = {
   user: NonNullable<Awaited<ReturnType<typeof getOrCreateUserByClerkId>>>;
 };
 
+// export const authMiddleware = async (
+//   c: Context<{ Variables: AuthVariables }>,
+//   next: Next
+// ) => {
+//   let clerkId = c.get("userId");
+
+  
+
+//   if (!clerkId) {
+//   clerkId = "63f0da8e-514a-4c56-8571-c9ac33c4cfa6"; // REAL USER UUID
+//   c.set("userId", clerkId);
+// }
+
+//   const user = await getOrCreateUserByClerkId(clerkId);
+
+//   if (!user) {
+//     throw new HTTPException(404, { message: "User not found" });
+//   }
+
+//   c.set("user", user);
+
+//   return next();
+// };
 export const authMiddleware = async (
   c: Context<{ Variables: AuthVariables }>,
   next: Next
 ) => {
-  let clerkId = c.get("userId");
+  const clerkId = c.get("userId");
 
-  
-
+  // 🚫 No user → not authenticated
   if (!clerkId) {
-  clerkId = "63f0da8e-514a-4c56-8571-c9ac33c4cfa6"; // REAL USER UUID
-  c.set("userId", clerkId);
-}
+    throw new HTTPException(401, { message: "Unauthorized" });
+  }
 
   const user = await getOrCreateUserByClerkId(clerkId);
 
