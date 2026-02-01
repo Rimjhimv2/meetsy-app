@@ -98,9 +98,12 @@ async function addConversations() {
       const [conversation] = await db
         .insert(conversations)
         .values({
-          matchId: match.id,
-          lastMessageAt: new Date(),
-        })
+  matchId: match.id,
+  user1Id: match.user1Id,
+  user2Id: match.user2Id,
+  lastMessageAt: new Date(),
+})
+
         .returning();
 
       console.log(`   ✓ Conversation created (ID: ${conversation.id})`);

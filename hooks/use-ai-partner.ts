@@ -2,7 +2,7 @@
 import { client } from "@/lib/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 export const useAiPartners = () => {
   const queryClient = useQueryClient();
 
@@ -14,17 +14,27 @@ export const useAiPartners = () => {
             param: { communityId },
           });
         return data;
-      } catch (err: any) {
-        console.error("AI Match error:", err);
-        throw new Error(err?.message || "Failed to find AI partner");
-      }
+      } 
+      
+      catch (err: unknown) {
+  console.error("AI Match error:", err);
+
+  if (err instanceof Error) {
+    throw new Error(err.message);
+  }
+
+  throw new Error("Failed to find AI partner");
+}
+
+
+
     },
 
     onSuccess: () => {
   queryClient.invalidateQueries({ queryKey: ["matches"] });
 },
 
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Error finding ai partner", error);
     },
   });

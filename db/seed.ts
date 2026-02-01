@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
+import { InferSelectModel } from "drizzle-orm";
 
 import { db } from "./index";
 import {
@@ -12,6 +13,11 @@ import {
   messages,
   conversationSummaries,
 } from "./schema";
+type User = InferSelectModel<typeof users>;
+type Community = InferSelectModel<typeof communities>;
+type LearningGoal = InferSelectModel<typeof learningGoals>;
+type Match = InferSelectModel<typeof matches>;
+type Conversation = InferSelectModel<typeof conversations>;
 
 // FREE USERS (1 community, 1 goal each - demonstrating limits)
 const freeUsers = [
@@ -546,6 +552,8 @@ async function comprehensiveSeed() {
       createdProUsers.push(created);
       console.log(`   ✓ ${user.name} (PRO - unlimited)`);
     }
+    
+
 
     const allUsers = [...createdFreeUsers, ...createdProUsers];
 
@@ -746,21 +754,41 @@ async function comprehensiveSeed() {
       match: (typeof createdMatches)[0];
     }> = [];
 
+    // for (const match of acceptedMatches) {
+    //   const [conversation] = await db
+    //     .insert(conversations)
+    //     .values({
+    //       matchId: match.id,
+    //       lastMessageAt: new Date(
+    //         Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
+    //       ), // Random time in last 7 days
+    //     })
+    //     .returning();
+    //   createdConversations.push({ ...conversation, match });
+    //   console.log(
+    //     `   ✓ Conversation for ${match.user1Name} ↔ ${match.user2Name}`
+    //   );
+    // }
+
     for (const match of acceptedMatches) {
-      const [conversation] = await db
-        .insert(conversations)
-        .values({
-          matchId: match.id,
-          lastMessageAt: new Date(
-            Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
-          ), // Random time in last 7 days
-        })
-        .returning();
-      createdConversations.push({ ...conversation, match });
-      console.log(
-        `   ✓ Conversation for ${match.user1Name} ↔ ${match.user2Name}`
-      );
-    }
+  const [conversation] = await db
+    .insert(conversations)
+    .values({
+      matchId: match.id,
+      user1Id: match.user1Id,
+      user2Id: match.user2Id,
+      lastMessageAt: new Date(
+        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
+      ),
+    })
+    .returning();
+
+  createdConversations.push({ ...conversation, match });
+
+  console.log(
+    `✓ Conversation for ${match.user1Name} ↔ ${match.user2Name}`
+  );
+}
 
     // 11. Create messages for conversations
     console.log("\n📝 Creating messages for conversations...");

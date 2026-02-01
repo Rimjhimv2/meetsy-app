@@ -60,11 +60,23 @@ const joinFirstCommunity = async () => {
       await joinCommunityMutation.mutateAsync(firstCommunity.community.id);
       toast.success("Joined community successfully");
     }
-  } catch (error: any) {
-    if (!error.message?.includes("already joined")) {
+  }
+  //  catch (error: unknown) {
+  //   if (!error.message?.includes("already joined")) {
+  //     toast.error("Failed to join community");
+  //   }
+  // }
+  catch (error: unknown) {
+  if (error instanceof Error) {
+    if (!error.message.includes("already joined")) {
       toast.error("Failed to join community");
     }
-  } finally {
+  } else {
+    toast.error("Failed to join community");
+  }
+}
+
+   finally {
     startTransition(() => {
       setSelectedCommunity(firstCommunity.community.id);
     });
