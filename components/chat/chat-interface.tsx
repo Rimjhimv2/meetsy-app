@@ -74,9 +74,10 @@ const { data: messages } = useQuery({
     const res = await client.api.conversations[
       ":conversationId"
     ].messages.$post({
-      param: { conversationId: conversation!.id }, // ✅ FIXED
-      json: { content: message },
-    });
+  param: { conversationId: conversation!.id },
+  content: message,
+});
+
 
     return res.json();
   },
