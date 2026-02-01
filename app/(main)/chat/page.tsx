@@ -136,13 +136,15 @@ export default function ChatPage() {
                     {match.userGoals && (
                       <span className="text-xs text-muted-foreground">
                         Your goals:{" "}
-                        {match.userGoals.map((g) => g.title).join(", ")}
+                       {match.userGoals.map((g: any) => g.title).join(", ")}
+
                       </span>
                     )}
                     {match.partnerGoals && match.partnerGoals.length > 0 && (
                       <span className="text-xs text-muted-foreground">
                         Their goals:{" "}
-                        {match.partnerGoals.map((g) => g.title).join(", ")}
+                        {match.partnerGoals.map((g: any) => g.title).join(", ")}
+
                       </span>
                     )}
                   </div>
