@@ -1,6 +1,8 @@
 
 import { db } from "@/db";
 import { conversations, messages } from "@/db/schema";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 
 import { Hono } from "hono";
 import { authMiddleware } from "./middleware/auth-middleware";
@@ -26,11 +28,23 @@ const conversationsApp = new Hono<{ Variables: Variables }>()
   })
   
 
-.post("/:conversationId/messages", async (c) => {
+// .post("/:conversationId/messages", async (c) => {
+.post(
+  "/:conversationId/messages",
+  zValidator(
+    "json",
+    z.object({
+      content: z.string().min(1),
+    })
+  ),
+  async (c) => {
+
   const conversationId = c.req.param("conversationId");
   const user = c.get("user");
 
-  const { content } = await c.req.json();
+  // const { content } = await c.req.json();
+  const { content } = c.req.valid("json");
+
 
   // 1️⃣ User message save
   await db.insert(messages).values({
