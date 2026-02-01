@@ -72,11 +72,14 @@ const { data: messages } = useQuery({
   const sendMessageMutation = useMutation({
   mutationFn: async () => {
     const res = await client.api.conversations[
-      ":conversationId"
-    ].messages.$post({
+  ":conversationId"
+].messages.$post({
   param: { conversationId: conversation!.id },
-  content: message,
+  json: {
+    content: message,
+  },
 });
+
 
 
     return res.json();
