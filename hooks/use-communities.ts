@@ -57,14 +57,15 @@ export const useJoinCommunity = () => {
       if (!res.ok) {
         const data = await res.json();
 
-        if (data?.error === "User already joined community") {
-          return data; // ✅ swallow error
-        }
-
+       if ("error" in data && data.error === "User already joined community") {
+  return data; // swallow
+}
         throw new Error("Failed to join community");
       }
 
       return res.json();
+     
+
     },
 
     onSuccess: () => {
