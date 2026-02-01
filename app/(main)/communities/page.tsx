@@ -36,23 +36,41 @@ export default function CommunitiesPage() {
 
     const firstCommunity = communities[0];
 
-    const joinFirstCommunity = async () => {
-      try {
-        if (!firstCommunity.joined) {
-          await joinCommunityMutation.mutateAsync(firstCommunity.community.id);
-          toast.success("Joined community successfully");
-        }
-      } catch (error: any) {
-        // Ignore "already joined" error
-        if (!error.message.includes("already joined")) {
-          toast.error("Failed to join community");
-        }
-      } finally {
-        startTransition(() => {
-          setSelectedCommunity(firstCommunity.community.id);
-        });
-      }
-    };
+//     const joinFirstCommunity = async () => {
+//       try {
+//         if (!firstCommunity.joinedAt) {
+//  {
+//           await joinCommunityMutation.mutateAsync(firstCommunity.community.id);
+//           toast.success("Joined community successfully");
+//         }
+//       } catch (error: any) {
+//         // Ignore "already joined" error
+//         if (!error.message.includes("already joined")) {
+//           toast.error("Failed to join community");
+//         }
+//       } finally {
+//         startTransition(() => {
+//           setSelectedCommunity(firstCommunity.community.id);
+//         });
+//       }
+//     };
+const joinFirstCommunity = async () => {
+  try {
+    if (!firstCommunity.joinedAt) {
+      await joinCommunityMutation.mutateAsync(firstCommunity.community.id);
+      toast.success("Joined community successfully");
+    }
+  } catch (error: any) {
+    if (!error.message?.includes("already joined")) {
+      toast.error("Failed to join community");
+    }
+  } finally {
+    startTransition(() => {
+      setSelectedCommunity(firstCommunity.community.id);
+    });
+  }
+};
+
 
     joinFirstCommunity();
   }, [communities, user]);
@@ -77,7 +95,7 @@ export default function CommunitiesPage() {
               >
                 {c.community.name}
               </Button>
-              {c.joined && <CheckIcon className="text-green-500" />}
+              {c.joinedAt && <CheckIcon className="text-green-500" />}
             </div>
           ))}
         </CardContent>
