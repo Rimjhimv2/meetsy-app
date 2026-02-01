@@ -83,7 +83,7 @@ Now respond to the user's last message.`;
     .values({
       conversationId,
       content: text,
-      senderId: null,
+      senderId:"ai",
       role: "assistant",
     })
     .returning();
