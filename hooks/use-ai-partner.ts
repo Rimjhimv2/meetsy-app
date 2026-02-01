@@ -88,15 +88,23 @@ export interface MatchUserGoal {
 }
 
 export interface MatchPartner {
+  id: string; 
   name: string;
   imageUrl?: string | null;
 }
 
+
+export interface MatchCommunity {
+  id: string;
+  name: string;
+}
 export interface Match {
   id: string;
   status: "pending" | "accepted";
   partner: MatchPartner;
   userGoals?: MatchUserGoal[];
+  partnerGoals?: MatchUserGoal[]; // ✅ ADD
+  community?: MatchCommunity; 
 }
 
 

@@ -45,11 +45,16 @@ export default function ChatPage() {
 
       <div className="flex gap-4 overflow-x-scroll">
         {pendingMatchesToShow?.map((match) => {
+          // const partner = {
+          //   id: match.partner.id || "",
+          //   name: match.partner.name || "Partner",
+          //   imageUrl: match.partner.imageUrl ?? undefined,
+          // };
           const partner = {
-            id: match.partner.id || "",
-            name: match.partner.name || "Partner",
-            imageUrl: match.partner.imageUrl ?? undefined,
-          };
+  name: match.partner.name || "Partner",
+  imageUrl: match.partner.imageUrl ?? undefined,
+};
+
           return (
             <Card
               key={match.id}
@@ -110,11 +115,16 @@ export default function ChatPage() {
       <h2 className="text-2xl font-semibold">Active Chats</h2>
       <div className="flex gap-4 overflow-x-scroll flex-col">
         {acceptedMatches?.map((match) => {
+          // const partner = {
+          //   id: match.partner.id || "",
+          //   name: match.partner.name || "Partner",
+          //   imageUrl: match.partner.imageUrl ?? undefined,
+          // };
           const partner = {
-            id: match.partner.id || "",
-            name: match.partner.name || "Partner",
-            imageUrl: match.partner.imageUrl ?? undefined,
-          };
+  name: match.partner.name || "Partner",
+  imageUrl: match.partner.imageUrl ?? undefined,
+};
+
           return (
             <Card
               key={match.id}
