@@ -40,7 +40,27 @@ export const aiMatchUsers = async (
 
     for (const member of members) {
       if (existingMatchUserIds.has(member.user.id)) continue;
-rGoals = goalsMap.get(member.user.id) || [];
+// rGoals = goalsMap.get(member.user.id) || [];
+
+// // 🔥 DEV MODE: allow even users without goals
+// potentialPartners.push({
+//   userId: member.user.id,
+//   username: member.user.name,
+//   goals:
+//     memberGoals.length > 0
+//       ? memberGoals.map((g) => ({
+//           title: g.title,
+//           description: g.description || "",
+//         }))
+//       : [
+//           {
+//             title: "No goals yet",
+//             description: "User has not added learning goals",
+//           },
+//         ],
+// });
+
+const memberGoals = goalsMap.get(member.user.id) || [];
 
 // 🔥 DEV MODE: allow even users without goals
 potentialPartners.push({
@@ -59,6 +79,8 @@ potentialPartners.push({
           },
         ],
 });
+
+
     }
 
     //    else {
@@ -91,12 +113,12 @@ ${idx + 1}. ${p.username}
 Task: Identify TOP 3 compatible learning partners. Return ONLY JSON array of 1-3 indices, e.g., [2,1,3].
 Return [] if no match.`;
 
-    const { text } = await generateText({
-      model: google("gemini-2.5-flash", { apiVersion: "v1" }), // <-- v1 API!
-      prompt,
-      temperature: 0.2,
-      maxTokens: 512,
-    });
+   const { text } = await generateText({
+  model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+  prompt,
+  temperature: 0.2,
+});
+
 
     let jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
 
@@ -157,12 +179,18 @@ Return JSON:
   "nextSteps": ["step1"]
 }`;
 
+    // const { text } = await generateText({
+    //   model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+    //   prompt,
+    //   temperature: 0.2,
+    //   maxTokens: 512,
+    // });
     const { text } = await generateText({
-      model: google("gemini-2.5-flash", { apiVersion: "v1" }),
-      prompt,
-      temperature: 0.2,
-      maxTokens: 512,
-    });
+  model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+  prompt,
+  temperature: 0.2,
+});
+
 
     let jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
     const parsed = JSON.parse(jsonText);

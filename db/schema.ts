@@ -101,6 +101,7 @@ export const messages = pgTable("messages", {
     .references(() => users.id)
     .notNull(),
   content: text("content").notNull(),
+  role: text("role"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

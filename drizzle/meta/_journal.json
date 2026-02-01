@@ -8,6 +8,13 @@
       "when": 1769430581986,
       "tag": "0000_good_lady_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769935343818,
+      "tag": "0001_glamorous_nightcrawler",
+      "breakpoints": true
     }
   ]
 }
