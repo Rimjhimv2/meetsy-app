@@ -68,7 +68,8 @@ Now respond to the user's last message.`;
 
   // 4️⃣ Gemini call
  const { text } = await generateText({
-  model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+  model: google("gemini-2.5-flash"),
+
   prompt,
   temperature: 0.2,
 });
