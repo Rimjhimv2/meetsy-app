@@ -1,11 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
 import Header from "./header";
 
-export default function HeaderWrapper() {
+export default async function HeaderWrapper() {
+
   let isPro = false;
 
   try {
-    const { has } = auth();
+   const { has } = await auth();
     isPro = has?.({ plan: "pro_plan" }) ?? false;
   } catch {
     isPro = false;
