@@ -35,8 +35,18 @@ export const aiMatchUsers = async (
 
     const goalsMap = await getGoalsByUsersAndCommunity(potentialMemberIds, communityId);
 
-    const potentialPartners = [];
-    const memberWithoutGoals = [];
+  type PotentialPartner = {
+  userId: string;
+  username: string;
+  goals: {
+    title: string;
+    description: string;
+  }[];
+};
+
+const potentialPartners: PotentialPartner[] = [];
+const memberWithoutGoals: string[] = [];
+
 
     for (const member of members) {
       if (existingMatchUserIds.has(member.user.id)) continue;
