@@ -31,8 +31,21 @@ export const useAiPartners = () => {
 };
 
 
+// export const useMatches = () => {
+//   return useQuery({
+//     queryKey: ["matches"],
+//     queryFn: async () => {
+//       const res = await client.api.matches["allmatches"].$get();
+
+//       if (!res.ok) {
+//         throw new Error("Failed to fetch potential matches");
+//       }
+//       return res.json();
+//     },
+//   });
+// };
 export const useMatches = () => {
-  return useQuery({
+  return useQuery<Match[]>({
     queryKey: ["matches"],
     queryFn: async () => {
       const res = await client.api.matches["allmatches"].$get();
@@ -40,10 +53,12 @@ export const useMatches = () => {
       if (!res.ok) {
         throw new Error("Failed to fetch potential matches");
       }
+
       return res.json();
     },
   });
 };
+
 
 export const useAcceptMatch = () => {
   const router = useRouter();
@@ -65,4 +80,23 @@ export const useAcceptMatch = () => {
     },
   });
 };
+
+
+
+export interface MatchUserGoal {
+  title: string;
+}
+
+export interface MatchPartner {
+  name: string;
+  imageUrl?: string | null;
+}
+
+export interface Match {
+  id: string;
+  status: "pending" | "accepted";
+  partner: MatchPartner;
+  userGoals?: MatchUserGoal[];
+}
+
 

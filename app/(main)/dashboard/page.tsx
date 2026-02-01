@@ -153,9 +153,10 @@ export default function DashboardPage() {
                           <CardDescription className="text-xs text-muted-foreground mt-1">
                             <span>
                             {/* {match.userGoals?.map((g: { id: string; title: string }) => g.title).join(", ") || "No goals"} */}
-                            {match.userGoals
+                           {match.userGoals
   ?.map((g: { title: string }) => g.title)
   .join(", ") || "No goals"}
+
 
 
 
