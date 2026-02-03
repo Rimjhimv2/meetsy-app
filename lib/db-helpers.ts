@@ -140,11 +140,54 @@ export const getGoalsByUsersAndCommunity = async (
   return goalsMap;
 };
 
+// export const createMatch = async (
+//   user1Id: string,
+//   user2Id: string,
+//   communityId: string
+// ) => {
+//   const [match] = await db
+//     .insert(matches)
+//     .values({
+//       user1Id,
+//       user2Id,
+//       communityId,
+//       status: "pending",
+//     })
+//     .returning();
+
+//   return match;
+// };
 export const createMatch = async (
   user1Id: string,
   user2Id: string,
   communityId: string
 ) => {
+  if (user1Id === user2Id) return null;
+
+  // 🔴 Check BOTH directions
+  const existing = await db
+    .select()
+    .from(matches)
+    .where(
+      or(
+        and(
+          eq(matches.user1Id, user1Id),
+          eq(matches.user2Id, user2Id),
+          eq(matches.communityId, communityId)
+        ),
+        and(
+          eq(matches.user1Id, user2Id),
+          eq(matches.user2Id, user1Id),
+          eq(matches.communityId, communityId)
+        )
+      )
+    );
+
+  if (existing.length > 0) {
+    console.log("⚠️ Match already exists:", user1Id, user2Id);
+    return null;
+  }
+
   const [match] = await db
     .insert(matches)
     .values({
@@ -157,6 +200,7 @@ export const createMatch = async (
 
   return match;
 };
+
 
 export const findMatchesByUserId = async (
   userId: string,

@@ -123,50 +123,145 @@ const matchesApp = new Hono<{ Variables: Variables }>()
       userGoalsByCommunity.set(communityId, goals);
     }
 
-    // Enrich matches with partner information, community info, and goals
-    const enrichedMatches = myMatches.map((match) => {
-      const partnerId = getPartnerUserId(match, user.id);
-      const partner = partnersMap.get(partnerId);
-      const allPartnerGoals = mergedPartnerGoalsMap.get(partnerId) || [];
-      const community = communitiesMap.get(match.communityId);
-      const userGoals = userGoalsByCommunity.get(match.communityId) || [];
+//     // Enrich matches with partner information, community info, and goals
+//     // const enrichedMatches = myMatches.map((match) => {
+// const enrichedMatches = await Promise.all(
+//   myMatches.map(async (match) => {
 
-      // Filter goals for this specific community
-      const partnerGoals = allPartnerGoals
-        .filter((g) => g.communityId === match.communityId)
-        .map((g) => ({
-          id: g.id,
-          title: g.title,
-          description: g.description,
-        }));
 
-      const userGoalsForMatch = userGoals.map((g) => ({
+//       const partnerId = getPartnerUserId(match, user.id);
+//       const partner = partnersMap.get(partnerId);
+//       const allPartnerGoals = mergedPartnerGoalsMap.get(partnerId) || [];
+//       const community = communitiesMap.get(match.communityId);
+//       const userGoals = userGoalsByCommunity.get(match.communityId) || [];
+
+//       // Filter goals for this specific community
+//       const partnerGoals = allPartnerGoals
+//         .filter((g) => g.communityId === match.communityId)
+//         .map((g) => ({
+//           id: g.id,
+//           title: g.title,
+//           description: g.description,
+//         }));
+
+//       const userGoalsForMatch = userGoals.map((g) => ({
+//         id: g.id,
+//         title: g.title,
+//         description: g.description,
+//       }));
+
+//       const [conversation] = await db
+//   .select()
+//   .from(conversations)
+//   .where(eq(conversations.matchId, match.id));
+
+
+//   return {
+//   ...match,
+//   partner: {
+//     id: partner?.id || partnerId,
+//     name: partner?.name || "Unknown User",
+//     imageUrl: partner?.imageUrl || null,
+//   },
+//   community: community
+//     ? {
+//         id: community.id,
+//         name: community.name,
+//         description: community.description,
+//         imageUrl: community.imageUrl,
+//       }
+//     : null,
+//   partnerGoals,
+//   userGoals: userGoalsForMatch,
+// };
+
+//    return {
+//   ...match,
+//   conversationId: conversation?.id ?? null, // 🔥 YE ACTIVE CHAT KEY HAI
+//   partner: {
+//     id: partner?.id || partnerId,
+//     name: partner?.name || "Unknown User",
+//     imageUrl: partner?.imageUrl || null,
+//   },
+//   community: community
+//     ? {
+//         id: community.id,
+//         name: community.name,
+//         description: community.description,
+//         imageUrl: community.imageUrl,
+//       }
+//     : null,
+//   partnerGoals,
+//   userGoals: userGoalsForMatch,
+// };
+
+   // Enrich matches with partner information, community info, goals + conversationId
+const enrichedMatches = await Promise.all(
+  myMatches.map(async (match) => {
+    const partnerId = getPartnerUserId(match, user.id);
+    const partner = partnersMap.get(partnerId);
+    const allPartnerGoals = mergedPartnerGoalsMap.get(partnerId) || [];
+    const community = communitiesMap.get(match.communityId);
+    const userGoals = userGoalsByCommunity.get(match.communityId) || [];
+
+    const partnerGoals = allPartnerGoals
+      .filter((g) => g.communityId === match.communityId)
+      .map((g) => ({
         id: g.id,
         title: g.title,
         description: g.description,
       }));
 
-      return {
-        ...match,
-        partner: {
-          id: partner?.id || partnerId,
-          name: partner?.name || "Unknown User",
-          imageUrl: partner?.imageUrl || null,
-        },
-        community: community
-          ? {
-              id: community.id,
-              name: community.name,
-              description: community.description,
-              imageUrl: community.imageUrl,
-            }
-          : null,
-        partnerGoals,
-        userGoals: userGoalsForMatch,
-      };
-    });
+    const userGoalsForMatch = userGoals.map((g) => ({
+      id: g.id,
+      title: g.title,
+      description: g.description,
+    }));
 
-   
+    // 🔥 THIS IS THE KEY FIX
+    // const [conversation] = await db
+    //   .select()
+    //   .from(conversations)
+    //   .where(eq(conversations.matchId, match.id));
+let [conversation] = await db
+  .select()
+  .from(conversations)
+  .where(eq(conversations.matchId, match.id));
+
+if (!conversation && match.status === "accepted") {
+  [conversation] = await db
+    .insert(conversations)
+    .values({
+      matchId: match.id,
+      user1Id: match.user1Id,
+      user2Id: match.user2Id,
+      lastMessageAt: new Date(),
+    })
+    .returning();
+}
+
+    return {
+      ...match,
+      conversationId: conversation?.id ?? null,
+      partner: {
+        id: partner?.id || partnerId,
+        name: partner?.name || "Unknown User",
+        imageUrl: partner?.imageUrl || null,
+      },
+      community: community
+        ? {
+            id: community.id,
+            name: community.name,
+            description: community.description,
+            imageUrl: community.imageUrl,
+          }
+        : null,
+      partnerGoals,
+      userGoals: userGoalsForMatch,
+    };
+  })
+);
+
 
 
 const pendingMatches = enrichedMatches.filter(
@@ -174,9 +269,15 @@ const pendingMatches = enrichedMatches.filter(
 );
 
 // 2️⃣ Accepted matches → dedupe by partner
+// const acceptedMatches = enrichedMatches.filter(
+//   (match) => match.status === "accepted"
+// );
 const acceptedMatches = enrichedMatches.filter(
-  (match) => match.status === "accepted"
+  (match) =>
+    match.status === "accepted" &&
+    match.conversationId !== null
 );
+
 
 // const uniqueAcceptedMap = new Map<string, any>();
 const uniqueAcceptedMap = new Map<

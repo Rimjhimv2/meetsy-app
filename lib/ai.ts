@@ -148,15 +148,39 @@ Return [] if no match.`;
       else throw new Error("AI returned invalid response");
     }
 
+    // const createdMatches = [];
+    // for (const idx of matchIndices) {
+    //   const partnerIndex = idx - 1;
+    //   if (partnerIndex >= 0 && partnerIndex < potentialPartners.length) {
+    //     const partner = potentialPartners[partnerIndex];
+    //     const match = await createMatch(user.id, partner.userId, communityId);
+    //     createdMatches.push({ ...match, partnerName: partner.username });
+    //   }
+    // }
     const createdMatches = [];
-    for (const idx of matchIndices) {
-      const partnerIndex = idx - 1;
-      if (partnerIndex >= 0 && partnerIndex < potentialPartners.length) {
-        const partner = potentialPartners[partnerIndex];
-        const match = await createMatch(user.id, partner.userId, communityId);
-        createdMatches.push({ ...match, partnerName: partner.username });
-      }
+
+for (const idx of matchIndices) {
+  const partnerIndex = idx - 1;
+
+  if (partnerIndex >= 0 && partnerIndex < potentialPartners.length) {
+    const partner = potentialPartners[partnerIndex];
+
+    const match = await createMatch(
+      user.id,
+      partner.userId,
+      communityId
+    );
+
+    // 🔥 THIS CHECK IS REQUIRED
+    if (match) {
+      createdMatches.push({
+        ...match,
+        partnerName: partner.username,
+      });
     }
+  }
+}
+
 
     console.log("Created matches:", createdMatches);
     return { matched: createdMatches.length, matches: createdMatches };
