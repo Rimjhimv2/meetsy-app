@@ -7,12 +7,27 @@ import { useAcceptMatch, useMatches } from "@/hooks/use-ai-partner";
 import { useCurrentUser } from "@/hooks/use-users";
 import { useRouter } from "next/navigation";
 
+
+type Match = {
+  id: string;
+  status: "accepted" | "pending" | "declined";
+  partner: {
+    name: string;
+    imageUrl?: string | null;
+  };
+  community?: {
+    name: string;
+  };
+  partnerGoals?: { id: string; title: string }[];
+  userGoals?: { id: string; title: string }[];
+};
+
 export default function ChatPage() {
   const {
-    data: matches,
+    data: matches=[],
     isLoading: isLoadingMatches,
     error: errorMatches,
-  } = useMatches();
+  } = useMatches<Match[]>();
 
   const { data: user } = useCurrentUser();
   const isPro = user?.isPro;
