@@ -99,7 +99,7 @@ export const messages = pgTable("messages", {
     .notNull(),
   senderId: uuid("sender_id")
     .references(() => users.id)
-    .notNull(),
+    ,
   content: text("content").notNull(),
   role: text("role").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
