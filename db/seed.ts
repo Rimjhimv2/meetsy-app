@@ -831,14 +831,24 @@ async function comprehensiveSeed() {
         const template = messageTemplates[i];
         const senderId = template.sender === "user1" ? user1!.id : user2!.id;
 
+        // await db.insert(messages).values({
+        //   conversationId: conv.id,
+        //   senderId,
+        //   content: template.content,
+        //   createdAt: new Date(
+        //     Date.now() - (messageCount - i) * 2 * 60 * 60 * 1000
+        //   ), // Messages spread over time
+        // });
         await db.insert(messages).values({
-          conversationId: conv.id,
-          senderId,
-          content: template.content,
-          createdAt: new Date(
-            Date.now() - (messageCount - i) * 2 * 60 * 60 * 1000
-          ), // Messages spread over time
-        });
+  conversationId: conv.id,
+  senderId,
+  content: template.content,
+  role: template.sender === "user1" ? "user" : "assistant",
+  createdAt: new Date(
+    Date.now() - (messageCount - i) * 2 * 60 * 60 * 1000
+  ),
+});
+
         totalMessages++;
       }
     }
