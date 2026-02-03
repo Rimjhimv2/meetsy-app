@@ -130,6 +130,7 @@ async function addConversations() {
           conversationId: conversation.id,
           senderId: template.senderId,
           content: template.content,
+          role: "user",
         });
       }
 

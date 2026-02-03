@@ -178,7 +178,12 @@ const acceptedMatches = enrichedMatches.filter(
   (match) => match.status === "accepted"
 );
 
-const uniqueAcceptedMap = new Map<string, any>();
+// const uniqueAcceptedMap = new Map<string, any>();
+const uniqueAcceptedMap = new Map<
+  string,
+  (typeof enrichedMatches)[number]
+>();
+
 
 for (const match of acceptedMatches) {
   const partnerId = getPartnerUserId(match, user.id);
@@ -197,6 +202,21 @@ return c.json([
 })
 
 
+// .put("/:matchId/accept", async (c) => {
+//   const matchId = c.req.param("matchId");
+
+//   const [match] = await db
+//     .update(matches)
+//     .set({ status: "accepted" })
+//     .where(eq(matches.id, matchId))
+//     .returning();
+
+//   if (!match) {
+//     throw new HTTPException(404, { message: "Match not found" });
+//   }
+
+//   return c.json(match);
+// })
 .put("/:matchId/accept", async (c) => {
   const matchId = c.req.param("matchId");
 
@@ -208,6 +228,22 @@ return c.json([
 
   if (!match) {
     throw new HTTPException(404, { message: "Match not found" });
+  }
+
+  // ✅ conversation exists check
+  const [existingConversation] = await db
+    .select()
+    .from(conversations)
+    .where(eq(conversations.matchId, match.id));
+
+  // ✅ create conversation if missing
+  if (!existingConversation) {
+    await db.insert(conversations).values({
+      matchId: match.id,
+      user1Id: match.user1Id,
+      user2Id: match.user2Id,
+      lastMessageAt: new Date(),
+    });
   }
 
   return c.json(match);

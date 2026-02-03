@@ -15,6 +15,13 @@
       "when": 1769935343818,
       "tag": "0001_glamorous_nightcrawler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770108654165,
+      "tag": "0002_romantic_firedrake",
+      "breakpoints": true
     }
   ]
 }

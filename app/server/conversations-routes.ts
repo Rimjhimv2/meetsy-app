@@ -92,15 +92,28 @@ Now respond to the user's last message.`;
 
 
   // 5️⃣ AI reply save
-  const [aiMessage] = await db
-    .insert(messages)
-    .values({
-      conversationId,
-      content: text,
-      senderId:"ai",
-      role: "assistant",
-    })
-    .returning();
+
+
+// const [aiMessage] = await db
+//   .insert(messages)
+//   .values({
+//     conversationId,
+//     content: aiText,
+//     senderId: null,
+//     role: "assistant",
+//   })
+//   .returning();
+
+const aiText = text?.trim() || "";
+
+await db.insert(messages).values({
+  conversationId,
+  content: aiText,
+  senderId: null,          // ✅ correct
+  role: "assistant",       // ✅ correct
+});
+
+
 
   // 6️⃣ Update lastMessageAt
   await db
