@@ -9,12 +9,86 @@ type Variables = {
   userId: string;
 };
 
+// const communitiesApp = new Hono<{ Variables: Variables }>()
+//   .use("/*", authMiddleware)
+//   .get("/all", async (c) => {
+//     const allCommunities = await db.select().from(communities);
+//     return c.json(allCommunities);
+//   })
+//   .get("/", async (c) => {
+//     const user = c.get("user");
+
+//     const userCommunities = await db
+//       .select({
+//         id: communityMembers.id,
+//         userId: communityMembers.userId,
+//         communityId: communityMembers.communityId,
+//         joinedAt: communityMembers.joinedAt,
+//         community: communities,
+//       })
+//       .from(communityMembers)
+//       .innerJoin(communities, eq(communityMembers.communityId, communities.id))
+//       .where(eq(communityMembers.userId, user.id));
+
+//     return c.json(userCommunities);
+//   })
+//   .post("/:communityId/join", async (c) => {
+//     const user = c.get("user");
+//     const communityId = c.req.param("communityId");
+
+//     const [existing] = await db
+//       .select()
+//       .from(communityMembers)
+//       .where(
+//         and(
+//           eq(communityMembers.userId, user.id),
+//           eq(communityMembers.communityId, communityId)
+//         )
+//       );
+
+//   if (existing) {
+//   return c.json(
+//     { message: "User already joined community" },
+//     200
+//   );
+// }
+
+
+//     await db.insert(communityMembers).values({
+//       userId: user.id,
+//       communityId: communityId,
+//     });
+//     return c.json({
+//       message: "Joined community successfully",
+//       communityId: communityId,
+//     });
+//   })
+//   .get("/:communityId/goals", async (c) => {
+//     const user = c.get("user");
+//     const communityId = c.req.param("communityId");
+
+//     const goals = await db
+//       .select()
+//       .from(learningGoals)
+//       .where(
+//         and(
+//           eq(learningGoals.userId, user.id),
+//           eq(learningGoals.communityId, communityId)
+//         )
+//       );
+
+//     return c.json(goals);
+//   });
 const communitiesApp = new Hono<{ Variables: Variables }>()
-  .use("/*", authMiddleware)
+  // ✅ PUBLIC ROUTE (NO AUTH)
   .get("/all", async (c) => {
     const allCommunities = await db.select().from(communities);
     return c.json(allCommunities);
   })
+
+  // 🔒 AUTH REQUIRED FROM HERE
+  .use("/*", authMiddleware)
+
   .get("/", async (c) => {
     const user = c.get("user");
 
@@ -32,6 +106,7 @@ const communitiesApp = new Hono<{ Variables: Variables }>()
 
     return c.json(userCommunities);
   })
+
   .post("/:communityId/join", async (c) => {
     const user = c.get("user");
     const communityId = c.req.param("communityId");
@@ -46,23 +121,24 @@ const communitiesApp = new Hono<{ Variables: Variables }>()
         )
       );
 
-  if (existing) {
-  return c.json(
-    { message: "User already joined community" },
-    200
-  );
-}
-
+    if (existing) {
+      return c.json(
+        { message: "User already joined community" },
+        200
+      );
+    }
 
     await db.insert(communityMembers).values({
       userId: user.id,
-      communityId: communityId,
+      communityId,
     });
+
     return c.json({
       message: "Joined community successfully",
-      communityId: communityId,
+      communityId,
     });
   })
+
   .get("/:communityId/goals", async (c) => {
     const user = c.get("user");
     const communityId = c.req.param("communityId");
@@ -79,5 +155,6 @@ const communitiesApp = new Hono<{ Variables: Variables }>()
 
     return c.json(goals);
   });
+
 
 export { communitiesApp };
