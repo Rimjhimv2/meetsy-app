@@ -15,6 +15,11 @@ import { getOrCreateUserByClerkId } from "./user-utils";
 import { conversationSummaries, learningGoals, messages } from "@/db/schema";
 import { db } from "@/db";
 import { desc, eq } from "drizzle-orm";
+type MemberGoal = {
+  title: string
+  description?: string | null
+}
+
 
 export const aiMatchUsers = async (
   user: NonNullable<Awaited<ReturnType<typeof getOrCreateUserByClerkId>>>,
@@ -70,8 +75,9 @@ const memberWithoutGoals: string[] = [];
 //         ],
 // });
 
-const memberGoals = goalsMap.get(member.user.id) || [];
-
+// const memberGoals = goalsMap.get(member.user.id) || [];
+const memberGoals: MemberGoal[] =
+    (goalsMap.get(member.user.id) as MemberGoal[]) || [];
 // 🔥 DEV MODE: allow even users without goals
 potentialPartners.push({
   userId: member.user.id,
@@ -82,13 +88,14 @@ potentialPartners.push({
           title: g.title,
           description: g.description || "",
         }))
+      
       : [
           {
             title: "No goals yet",
             description: "User has not added learning goals",
           },
         ],
-});
+})
 
 
     }
@@ -123,14 +130,13 @@ ${idx + 1}. ${p.username}
 Task: Identify TOP 3 compatible learning partners. Return ONLY JSON array of 1-3 indices, e.g., [2,1,3].
 Return [] if no match.`;
 
-   const { text } = await generateText({
-  model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+  const { text } = await generateText({
+  model: google("gemini-2.5-flash"),
   prompt,
   temperature: 0.2,
 });
 
-
-    let jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
+    const jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
 
     let matchIndices: number[] = [];
     try {
@@ -195,14 +201,15 @@ Return JSON:
     //   temperature: 0.2,
     //   maxTokens: 512,
     // });
-    const { text } = await generateText({
-  model: google("gemini-2.5-flash", { apiVersion: "v1" }),
+  const { text } = await generateText({
+  model: google("gemini-2.5-flash"),
   prompt,
   temperature: 0.2,
 });
 
 
-    let jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
+
+    const jsonText = text.trim().replace(/^```(json)?\s*/, "").replace(/```$/, "");
     const parsed = JSON.parse(jsonText);
 
     const [summary] = await db
