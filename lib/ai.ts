@@ -174,7 +174,15 @@ export const generateAISummaries = async (
   conversationMessages: (typeof messages.$inferSelect)[]
 ) => {
   try {
-    const userIds = [...new Set(conversationMessages.map((m) => m.senderId))];
+    // const userIds = [...new Set(conversationMessages.map((m) => m.senderId))];
+    const userIds = [
+  ...new Set(
+    conversationMessages
+      .map((m) => m.senderId)
+      .filter((id): id is string => id !== null)
+  ),
+];
+
     const usersMap = await getUsersByIds(userIds);
 
     const formattedMessages = conversationMessages.map((m) => {
