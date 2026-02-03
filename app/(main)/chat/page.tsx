@@ -27,7 +27,7 @@ export default function ChatPage() {
     data: matches=[],
     isLoading: isLoadingMatches,
     error: errorMatches,
-  } = useMatches<Match[]>();
+  } = useMatches();
 
   const { data: user } = useCurrentUser();
   const isPro = user?.isPro;

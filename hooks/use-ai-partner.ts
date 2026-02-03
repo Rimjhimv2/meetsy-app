@@ -41,8 +41,9 @@ export const useAiPartners = () => {
 };
 
 
+
 // export const useMatches = () => {
-//   return useQuery({
+//   return useQuery<Match[]>({
 //     queryKey: ["matches"],
 //     queryFn: async () => {
 //       const res = await client.api.matches["allmatches"].$get();
@@ -50,6 +51,7 @@ export const useAiPartners = () => {
 //       if (!res.ok) {
 //         throw new Error("Failed to fetch potential matches");
 //       }
+
 //       return res.json();
 //     },
 //   });
@@ -64,10 +66,12 @@ export const useMatches = () => {
         throw new Error("Failed to fetch potential matches");
       }
 
-      return res.json();
+      const data = (await res.json()) as Match[]; // ✅ IMPORTANT
+      return data;
     },
   });
 };
+
 
 
 export const useAcceptMatch = () => {
