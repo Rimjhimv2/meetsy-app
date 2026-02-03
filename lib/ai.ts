@@ -184,11 +184,15 @@ export const generateAISummaries = async (
 ];
 
     const usersMap = await getUsersByIds(userIds);
+const formattedMessages = conversationMessages.map((m) => {
+  if (!m.senderId) {
+    return `Assistant: ${m.content}`;
+  }
 
-    const formattedMessages = conversationMessages.map((m) => {
-      const user = usersMap.get(m.senderId);
-      return `${user?.name}: ${m.content}`;
-    });
+  const user = usersMap.get(m.senderId);
+  return `${user?.name ?? "User"}: ${m.content}`;
+});
+
     const conversationText = formattedMessages.join("\n");
 
     const prompt = `You are an AI assistant that summarizes learning conversations.
